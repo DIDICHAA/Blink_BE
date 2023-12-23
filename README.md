@@ -9,7 +9,7 @@
 |전병현    | -|
 ## Stack
 - **server**
-    - django REST framework
+    - django REST framework
 ## 초기 셋팅
 ### 1. 가상환경 생성
 windows : python -m venv {가상 환경 이름}
