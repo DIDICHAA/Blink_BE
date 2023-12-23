@@ -8,7 +8,7 @@
 | 차은호     | eunho2002@dgu.ac.kr |
 |전병현    | -|
 ## Stack
-- **server**
+- **server**  
     - django REST framework
 ## 초기 셋팅
 ### 1. 가상환경 생성
@@ -23,8 +23,8 @@ mac : python3 -m venv {가상 환경 이름}
 pip install -r requirements.txt
 - **추가된 pip 어쩌구 있으면 'pip freeze > requirements.txt' 명령어 꼭 사용**
 ### 4. db 마이그레이션 진행
-- manage.py 파일이 있는 위치로 이동 후
-    - python manage.py makemigrations
+- manage.py 파일이 있는 위치로 이동 후  
+    - python manage.py makemigrations  
     - python manage.py migrate
 ### 4-1. 앱 추가
 python manage.py createapp {앱 이름}
