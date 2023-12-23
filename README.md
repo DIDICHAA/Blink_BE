@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ### 4. db 마이그레이션 진행
 - manage.py 파일이 있는 위치로 이동 후  
     - python manage.py makemigrations  
-    - python manage.py migrate
+    - python manage.py migrate
 ### 4-1. 앱 추가
 python manage.py createapp {앱 이름}
 ### 5. 서버 실행
