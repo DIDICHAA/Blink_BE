@@ -6,7 +6,7 @@
 | 서지은     | jieun61586@gmail.com |
 |이상준    | lsjmc0224@gmail.com |
 | 차은호     | eunho2002@dgu.ac.kr |
-|전병현    | -|
+|전병현    | qudgus0522@gmail.com |
 ## Stack
 - **server**  
     - django REST framework
