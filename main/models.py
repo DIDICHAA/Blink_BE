@@ -10,7 +10,7 @@ class Main(models.Model):
         ('실종신고', '실종신고'),
         ('기타', '기타')
     ]
-    REPORT_CHOICES= [
+    ARTICLE_CHOICES= [
         ('찾아요', '찾아요'),
         ('제보해요', '제보해요')
     ]
@@ -19,8 +19,8 @@ class Main(models.Model):
         choices = CATEGORY_CHOICES,
         default = '교통사고',
     )
-    report = models.CharField(
+    article = models.CharField(
         max_length=10,
-        choices = REPORT_CHOICES,
+        choices = ARTICLE_CHOICES,
         default = '찾아요'
     )
