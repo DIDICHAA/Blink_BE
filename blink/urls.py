@@ -18,25 +18,25 @@ from django.contrib import admin
 from django.urls import path
 
 # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
-from drf-yasg.views import get_schema_view
-from drf-yasg import openapi
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Your Server Name or Swagger Docs name",
-        default_version="Your API version(Custom)",
-        description="Your Swagger Docs descriptions",
+        title="Snippets API",
+        default_version='v1',
+        description="Test description",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(name="test", email="test@test.com"),
-        license=openapi.License(name="Test License"),
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
     ),
     public=True,
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('api/v1/admin/', admin.site.urls),
     # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view_v1.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', schema_view_v1.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view_v1.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('api/v1/swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
