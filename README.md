@@ -15,7 +15,7 @@
 windows : python -m venv {가상 환경 이름}
 mac : python3 -m venv {가상 환경 이름}
 - **가상환경 이름은 venv**
-- **가상환경 version은 3.12로 통일**
+- **가상환경 version은 3.11로 통일**
 ### 2. 가상환경 실행
 - windows : source {가상 환경 이름}/Scripts/activate
 - mac : source {가상 환경 이름}/bin/activate
