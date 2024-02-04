@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
 from drf_yasg.views import get_schema_view
@@ -41,4 +43,4 @@ urlpatterns = [
     path('api/v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/user/', include('allauth.urls')),
     path('api/v1/user/', include('user.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
