@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 
+def image_upload_path(instance, filename):
+    return f'{instance.email}/{filename}'
 
 class UserManager(BaseUserManager):
     # 일반 user
@@ -39,6 +41,7 @@ class User(AbstractUser, PermissionsMixin):
     email = models.EmailField(default='', max_length=255, null=False, blank=True, unique=True)
     nickname = models.CharField(default='', max_length=100, null=False, blank=False, unique=True)
     isExpert = models.BooleanField(default=False, blank=False, null=False)
+    profile_image = models.ImageField(default='default_profile_image.jpg', upload_to=image_upload_path, blank=True, null=True)
 
     is_active = models.BooleanField(default=True)    
     is_admin = models.BooleanField(default=False)
