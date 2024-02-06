@@ -3,7 +3,7 @@ import os
 
 from user.models import User
 from json.decoder import JSONDecodeError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth import login
 
@@ -123,13 +123,17 @@ def google_callback(request):
 
     login(request, user)
 
-    response = {
+    response = JsonResponse({
         "messeage" : "google login!",
         "access_token" : access_token,
         "refresh_token" : str(refresh)
-    }
+    })
+    
+    response.set_cookie("access_token", access_token)
+    response.set_cookie("refresh_token", str(refresh))
 
-    return JsonResponse(response)
+
+    return response
 
 class GoogleLogin(SocialLoginView):
     adapter_class = google_view.GoogleOAuth2Adapter
@@ -227,13 +231,17 @@ def naver_callback(request):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
 
-    response = {
-        "messeage" : "naver login!",
+    response = JsonResponse({
+        "messeage" : "google login!",
         "access_token" : access_token,
         "refresh_token" : str(refresh)
-    }
+    })
+    
+    response.set_cookie("access_token", access_token)
+    response.set_cookie("refresh_token", str(refresh))
 
-    return JsonResponse(response)
+
+    return response
 
 
 class NaverLogin(SocialLoginView):
@@ -329,13 +337,25 @@ def kakao_callback(request):
 
     login(request, user)
 
-    response = {
-        "messeage" : "kakao login!",
+    response = JsonResponse({
+        "messeage" : "google login!",
         "access_token" : access_token,
         "refresh_token" : str(refresh)
-    }
+    })
+    
+    response.set_cookie("access_token", access_token)
+    response.set_cookie("refresh_token", str(refresh))
 
-    return JsonResponse(response)
+
+    return response
+
+    # response = {
+    #     "messeage" : "kakao login!",
+    #     "access_token" : access_token,
+    #     "refresh_token" : str(refresh)
+    # }
+
+    # return JsonResponse(response)
 
 class KakaoLogin(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
