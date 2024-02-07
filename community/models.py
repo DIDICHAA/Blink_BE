@@ -35,6 +35,36 @@ class Post(models.Model):
     def get_category_choices(cls):
         return cls.CATEGORY_CHOICES
 
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None, related_name='image')
+    image = models.ImageField(upload_to=post_image_path)
+    
+    def __str__(self):
+        return str(self.post)
+    
+
+class PostLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # 좋아요 누른 사용자
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes') # 좋아요 누른 게시글
+
+    class Meta:
+        unique_together = ('user', 'post')  # 사용자는 같은 게시글에 중복 좋아요 불가능
+    
+    def __str__(self):
+        return f"{self.user}가 좋아요한 글 : {self.post.title}"
+
+
+class PostBookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # 북마크한 사용자
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='bookmarks') # 저장된 게시글
+
+    class Meta:
+        unique_together = ('user', 'post')  # 사용자는 같은 게시글에 중복하여 북마크 불가능
+    
+    def __str__(self):
+        return f"{self.user}가 북마크한 글 : {self.post.title}"
+
+### Comment
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
@@ -50,31 +80,16 @@ class Comment(models.Model):
             self.depth = self.parent.depth + 1
         super().save(*args, **kwargs)
 
-class PostImage(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None, related_name='image')
-    image = models.ImageField(upload_to=post_image_path)
-    
     def __str__(self):
-        return str(self.post)
-    
+        return f"작성자 : {self.writer} | 글 : {self.post.title} | 내용 : {self.text}"
 
-class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # 좋아요 누른 사용자
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes') # 좋아요 누른 게시글
+
+class CommentLike(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # 좋아요한 사용자
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
 
     class Meta:
-        unique_together = ('user', 'post')  # 사용자는 같은 게시글에 중복 좋아요 불가능
+        unique_together = ('user', 'comment')  # 사용자는 같은 게시글에 중복하여 좋아요 불가능
     
     def __str__(self):
-        return f"{self.user}가 좋아요한 글 : {self.post.title}"
-
-
-class Bookmark(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # 북마크한 사용자
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='bookmarks') # 저장된 게시글
-
-    class Meta:
-        unique_together = ('user', 'post')  # 사용자는 같은 게시글에 중복하여 북마크 불가능
-    
-    def __str__(self):
-        return f"{self.user}가 북마크한 글 : {self.post.title}"
+        return f"{self.user}가 좋아요한 댓글 : {self.comment.text}"
