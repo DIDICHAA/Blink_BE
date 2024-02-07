@@ -37,10 +37,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/v1/admin/', admin.site.urls),
-    # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
-    path('api/v1/swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/user/', include('allauth.urls')),
     path('api/v1/user/', include('user.urls')),
+    path('api/v1/', include('community.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+if settings.DEBUG:
+    urlpatterns += [
+        # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
+        path('api/v1/swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        path('api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        path('api/v1/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),       
+]
