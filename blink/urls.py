@@ -17,6 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.conf.urls.static import static
+
 # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -35,8 +37,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/v1/admin/', admin.site.urls),
+    path('api/v1/user/', include('allauth.urls')),
+    path('api/v1/user/', include('user.urls')),
     path('api/v1/', include('community.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 if settings.DEBUG:
     urlpatterns += [
