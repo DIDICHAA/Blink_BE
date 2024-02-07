@@ -27,3 +27,25 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
         read_only_fields = ['writer']
+
+### comment
+class CommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+
+    def get_replies(self, obj):
+        if obj.replies:
+            return CommentSerializer(obj.replies, many=True).data
+        return []
+
+    class Meta:
+        model = Comment
+        fields = (
+            'post',
+            'id',
+            'writer',
+            'parent',
+            'text',
+            'replies',
+            'created_at'
+        )
+        read_only_fields = ['writer']
