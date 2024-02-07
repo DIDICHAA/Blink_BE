@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)q6g2623j_*-smhk8$$-j--1tw3q3(w*5vy531ts3whcx1wk(_'
+SECRET_KEY = config('SECRET_KEY')
+# SECRET_KEY = 'django-insecure-)q6g2623j_*-smhk8$$-j--1tw3q3(w*5vy531ts3whcx1wk(_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG_VALUE', default=True, cast=bool)
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders', # CORS 관련 앱 추가
 
     'main',
     'pro',
@@ -47,6 +52,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # CORS 관련 추가
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -74,10 +83,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blink.wsgi.application'
 
+# CORS 관련 추가
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost:5173',
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# 기본 설정 (개발환경)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -85,6 +108,18 @@ DATABASES = {
     }
 }
 
+# 배포환경에서의 설정
+# if config('DJANGO_DEPLOY', default=False, cast=bool):
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': config('DATABASE_ENGINE'),
+#             'NAME': config('DATABASE_NAME'),
+#             'USER': config('DATABASE_USER'),
+#             'PASSWORD': config('DATABASE_USER_PASSWORD'),
+#             'HOST': config('DATABASE_HOST'),
+#             'PORT': config('DATABASE_PORT')
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -121,8 +156,13 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# media 추가
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
