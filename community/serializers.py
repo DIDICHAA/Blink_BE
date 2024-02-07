@@ -35,6 +35,7 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     likes_cnt = serializers.IntegerField(read_only=True)
+
     def get_replies(self, obj):
         if obj.replies:
             return CommentSerializer(obj.replies, many=True).data
@@ -48,7 +49,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'writer',
             'parent',
             'text',
-            'replies'
+            'replies',
             'likes_cnt',
             'created_at'
         )
