@@ -13,6 +13,7 @@ class PostImageSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     writer = serializers.SerializerMethodField()
+    likes_cnt = serializers.IntegerField(read_only=True)
 
     def get_images(self, obj):
         images = obj.get_images()
@@ -26,12 +27,14 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
-        read_only_fields = ['writer']
-
+        read_only_fields = (
+            'writer',
+            'likes_cnt'
+        )
 ### comment
 class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
-
+    likes_cnt = serializers.IntegerField(read_only=True)
     def get_replies(self, obj):
         if obj.replies:
             return CommentSerializer(obj.replies, many=True).data
@@ -45,7 +48,11 @@ class CommentSerializer(serializers.ModelSerializer):
             'writer',
             'parent',
             'text',
-            'replies',
+            'replies'
+            'likes_cnt',
             'created_at'
         )
-        read_only_fields = ['writer']
+        read_only_fields = (
+            'writer',
+            'likes_cnt'
+        )
