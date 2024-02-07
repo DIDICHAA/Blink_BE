@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 # swagger 관련 ( 참고 : https://velog.io/@emrrbs9090/DjangoSwagger-with-DRFyasg )
 from drf_yasg.views import get_schema_view
@@ -35,6 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/v1/admin/', admin.site.urls),
+    path('api/v1/', include('community.urls')),
 ]
 
 if settings.DEBUG:
