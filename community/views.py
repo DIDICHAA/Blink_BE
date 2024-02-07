@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.decorators import api_view, permission_classes
 
+from drf_yasg.utils import swagger_auto_schema
+
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count
@@ -13,23 +15,37 @@ from .serializers import PostSerializer, CommentSerializer
 from .paginations import *
 
 # Create your views here.
-class PostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin):
+class PostBasicViewSet(viewsets.GenericViewSet,mixins.DestroyModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.ListModelMixin):
     serializer_class = PostSerializer
     pagination_class = PostPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category']
     MAX_IMAGES = 3  # 클래스 변수로 상수 선언
 
-    def get_queryset(self):
-        return Post.objects.filter(is_draft=False).order_by('-created_at').annotate(
-            likes_cnt=Count('likes',distinct=True)
-        )
-    
-    def get_permissions(self):
-        if self.action in ['list','retrieve']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    def update(self, request, *args, **kwargs):
+        image_set = request.FILES.getlist('images')
 
+        if len(image_set) > self.MAX_IMAGES:
+            response = {'error': f'최대 {self.MAX_IMAGES}개의 이미지를 업로드할 수 있습니다.'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+        instance = self.get_object()
+        
+        for image in instance.image.all():
+            image.image.delete(save=False)  # 파일 삭제
+            image.delete()  # 모델 인스턴스 삭제
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        for image_data in image_set:
+            PostImage.objects.create(post=instance, image=image_data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PostViewSet(PostBasicViewSet, mixins.CreateModelMixin):
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category']
+    
     def create(self, request, *args, **kwargs):
         image_set = request.FILES.getlist('images')
 
@@ -55,28 +71,16 @@ class PostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         # save 메서드에 writer를 전달
         serializer.save(writer=writer)
 
-    def update(self, request, *args, **kwargs):
-        image_set = request.FILES.getlist('images')
+    def get_queryset(self):
+        return Post.objects.filter(is_draft=False).order_by('-created_at').annotate(
+            likes_cnt=Count('likes',distinct=True)
+        )
 
-        if len(image_set) > self.MAX_IMAGES:
-            response = {'error': f'최대 {self.MAX_IMAGES}개의 이미지를 업로드할 수 있습니다.'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    def get_permissions(self):
+        if self.action in ['list','retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
-        instance = self.get_object()
-        
-        for image in instance.image.all():
-            image.image.delete(save=False)  # 파일 삭제
-            image.delete()  # 모델 인스턴스 삭제
-
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        for image_data in image_set:
-            PostImage.objects.create(post=instance, image=image_data)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
     @action(methods=['POST', 'DELETE'], detail=True, url_path='like')
     def like_action(self, request, *args, **kwargs):
         post = self.get_object()
@@ -109,9 +113,9 @@ class PostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         return Response({'message': message})
 
 
-class MyDraftViewSet(PostViewSet):
+class MyDraftViewSet(PostBasicViewSet):
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         return Post.objects.filter(is_draft=True, writer=self.request.user).order_by('-created_at')
 
@@ -134,7 +138,6 @@ class MyLikePostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.R
             likes_cnt=Count('likes',distinct=True)            
         )
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_post_like_status(request, post_id):
@@ -143,7 +146,6 @@ def get_post_like_status(request, post_id):
 
     is_liked = post.likes.filter(user=user).exists()
     return Response({'is_liked': is_liked})
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -155,7 +157,7 @@ def get_post_bookmark_status(request, post_id):
     return Response({'is_bookmarked': is_bookmarked})
 
 ### Comment
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins. CreateModelMixin, mixins.DestroyModelMixin):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
