@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -34,6 +35,20 @@ class Post(models.Model):
     def get_category_choices(cls):
         return cls.CATEGORY_CHOICES
 
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    writer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    text = models.CharField(verbose_name='댓글 내용',max_length=100)
+    depth = models.IntegerField(default=0)
+    created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            if self.parent.depth >= 1:  # 최대 깊이는 1
+                raise ValidationError("Can't add more depth to this comment")
+            self.depth = self.parent.depth + 1
+        super().save(*args, **kwargs)
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None, related_name='image')

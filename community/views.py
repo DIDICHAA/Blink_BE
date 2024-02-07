@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_list_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Post, PostImage
-from .serializers import PostSerializer
+from .models import Post, PostImage, Comment
+from .serializers import PostSerializer, CommentSerializer
 from .paginations import *
 
 # Create your views here.
@@ -74,7 +74,22 @@ class PostViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
 
 
 class MyDraftViewSet(PostViewSet):
-    permission_classes = [IsAuthenticated()]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         return Post.objects.filter(is_draft=True, writer=self.request.user).order_by('-created_at')
+
+### Comment
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('post_id') 
+        if post_id is not None:
+            return Comment.objects.filter(post__id=post_id, parent=None)  # post_id에 해당하는 원본 댓글만 가져오기
+        return Comment.objects.filter(parent=None)  # 모든 댓글 가져오기
+    
+    def perform_create(self, serializer):
+        return serializer.save(writer=self.request.user)
