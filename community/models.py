@@ -5,13 +5,15 @@ User = get_user_model()
 
 def post_image_path(instance, filename):
     post = instance.post
-    return f'post/{instance.category}/{post.id}/{post.created_at.strftime("%Y/%m/%d")}/{filename}'
+    return f'post/{post.category}/{post.id}/{post.created_at.strftime("%Y/%m/%d")}/{filename}'
 
 # Create your models here.
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(verbose_name='제목',max_length=30,null=False,blank=False)
     writer = models.ForeignKey(User, on_delete=models.CASCADE) # 작성자가 계정 삭제시 게시글이 남아야한다면 변경 필요
+    is_anonymous = models.BooleanField(verbose_name='익명 여부',default=False)
+    is_draft = models.BooleanField(verbose_name='작성 완료',default=False)
     content = models.TextField(verbose_name='내용')
     CATEGORY_CHOICES = [
         ('몇대몇', '몇대몇'),
@@ -24,10 +26,14 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-    
         
-    def images(self):
+    def get_images(self):
         return self.image.all()
+    
+    @classmethod
+    def get_category_choices(cls):
+        return cls.CATEGORY_CHOICES
+
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, default=None, related_name='image')
