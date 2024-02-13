@@ -44,7 +44,7 @@ jobs:
 
     - name: Run tests
       run:
-	    python3 manage.py test
+        python3 manage.py test
 
     ### Docker Image Build and Push ###
     - name: Login to Docker Hub
