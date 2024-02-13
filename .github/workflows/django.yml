@@ -18,7 +18,7 @@ jobs:
 
     - name: Create .env
       shell: bash
-      run:
+      run: |
         touch .env
         echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
         echo ADMIN_PATH=${{ secrets.ADMIN_PATH }} >> .env
@@ -38,12 +38,12 @@ jobs:
         python-version: 3.11
 
     - name: Install dependencies
-      run:
+      run: |
         python -m pip install --upgrade pip
         pip3 install -r requirements.txt
 
     - name: Run tests
-      run:
+      run: |
         python3 manage.py test
 
     ### Docker Image Build and Push ###
@@ -72,7 +72,7 @@ jobs:
     if: github.event.pull_request.merged == true
     needs: [CI]
     
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     ### SSH Connect and Docker Image Pull and Container Run
