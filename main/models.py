@@ -1,9 +1,14 @@
 from django.db import models
 
-class Main(models.Model):
+class MainPost(models.Model):
     id = models.AutoField(primary_key=True)
     content = models.TextField(max_length=3000)
     created_at = models.DateTimeField(auto_now=True)
+    start_date = models.CharField(max_length=20)
+    end_date = models.CharField(max_length=20)
+    address = models.TextField(max_length=200)
+    latitude = models.CharField(max_length=10)
+    longtitude = models.CharField(max_length=10)
     CATEGORY_CHOICES = [
         ('교통사고', '교통사고'),
         ('도난, 절도', '도난, 절도'),
@@ -24,3 +29,17 @@ class Main(models.Model):
         choices = ARTICLE_CHOICES,
         default = '찾아요'
     )
+
+class MainComment(models.Model):
+    id = models.AutoField(primary_key=True)
+    mainpost = models.ForeignKey(MainPost, blank=False, null=False, on_delete=models.CASCADE, related_name='comments')
+    writer = models.CharField(max_length=50)
+    content = models.TextField(max_length=300)
+    created_at = models.DateTimeField(auto_now=True)
+
+class MainReply(models.Model):
+    id = models.AutoField(primary_key=True)
+    maincomment = models.ForeignKey(MainComment, blank=False, null=False, on_delete=models.CASCADE, related_name='replies')
+    writer = models.CharField(max_length=50)
+    content = models.TextField(max_length=300)
+    created_at = models.DateTimeField(auto_now=True)
