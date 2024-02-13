@@ -199,6 +199,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://blink-dgu.com",
+    "https://blink-dgu.com",
+    "http://www.blink-dgu.com",
+    "https://www.blink-dgu.com",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
