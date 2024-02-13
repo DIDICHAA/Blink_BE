@@ -87,4 +87,4 @@ jobs:
           docker stop blink-was
           docker rm blink-was
           docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
-          docker run -d -v blink-media:/app/media -v blink-static:/app/static -e TZ=Asia/Seoul -p 8000:8000 --name blink-was ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
+          docker run -d -v /home/django/media:/app/media -v /home/django/static:/app/static -e TZ=Asia/Seoul -p 8000:8000 --name blink-was ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
