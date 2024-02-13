@@ -155,17 +155,17 @@ DATABASES = {
 }
 
 # 배포환경에서의 설정
-# if config('DJANGO_DEPLOY', default=False, cast=bool):
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': config('DATABASE_ENGINE'),
-#             'NAME': config('DATABASE_NAME'),
-#             'USER': config('DATABASE_USER'),
-#             'PASSWORD': config('DATABASE_USER_PASSWORD'),
-#             'HOST': config('DATABASE_HOST'),
-#             'PORT': config('DATABASE_PORT')
-#         }
-#     }
+if config('DJANGO_DEPLOY', default=False, cast=bool):
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DATABASE_ENGINE'),
+            'NAME': config('DATABASE_NAME'),
+            'USER': config('DATABASE_USER'),
+            'PASSWORD': config('DATABASE_USER_PASSWORD'),
+            'HOST': config('DATABASE_HOST'),
+            'PORT': config('DATABASE_PORT')
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -199,6 +199,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://blink-dgu.com",
+    "https://blink-dgu.com",
+    "http://www.blink-dgu.com",
+    "https://www.blink-dgu.com",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -215,7 +221,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Media files
@@ -226,7 +232,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# media 추가
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

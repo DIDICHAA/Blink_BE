@@ -10,7 +10,7 @@ jobs:
 # safe tag에 대한 gradlew test && merged에 대한 docker image build and push
   CI:
     if: contains(github.event.pull_request.labels.*.name, 'safe')
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
@@ -18,7 +18,7 @@ jobs:
 
     - name: Create .env
       shell: bash
-      run:
+      run: |
         touch .env
         echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
         echo ADMIN_PATH=${{ secrets.ADMIN_PATH }} >> .env
@@ -38,13 +38,13 @@ jobs:
         python-version: 3.11
 
     - name: Install dependencies
-      run:
+      run: |
         python -m pip install --upgrade pip
-        pip3 install -r requirements.txt
+        pip install -r requirements.txt
 
     - name: Run tests
-      run:
-	    python3 manage.py test
+      run: |
+        python3 manage.py test
 
     ### Docker Image Build and Push ###
     - name: Login to Docker Hub
@@ -72,7 +72,7 @@ jobs:
     if: github.event.pull_request.merged == true
     needs: [CI]
     
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     ### SSH Connect and Docker Image Pull and Container Run
@@ -87,4 +87,4 @@ jobs:
           docker stop blink-was
           docker rm blink-was
           docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
-          docker run -d --net blink -v blink-media:/app/media -v blink-static:/app/static -e TZ=Asia/Seoul -p 8000:8000 --name blink-was ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
+          docker run -d -v /home/django/media:/app/media -v /home/django/static:/app/static -e TZ=Asia/Seoul -p 8000:8000 --name blink-was ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
